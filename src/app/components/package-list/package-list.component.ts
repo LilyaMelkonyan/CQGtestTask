@@ -54,9 +54,9 @@ export class PackageListComponent {
 
   filterByName() {
     // for large data is better to use fromEvent with debounceTime and distinctUntilChange
-    const search = this.searchedItem.trim().toLowerCase();
-    this.filteredPackages = this.searchedItem ? 
-      this.packages.filter(pkg => pkg.id.toLowerCase().includes(search)) : 
+    const name = this.searchedItem.trim().toLowerCase();
+    this.filteredPackages = name ? 
+      this.packages.filter(pkg => pkg.id.toLowerCase().includes(name)) : 
       this.packages
   }
 

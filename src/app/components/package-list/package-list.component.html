@@ -12,7 +12,7 @@
     <div class="col-12 border border-1 border-dark p-3 scroll-box">
         <div class="row">
             <ng-container *ngIf="!isLoading, else loading">
-                <ng-container *ngIf="filteredPackages && filteredPackages.length; else empty">
+                <ng-container *ngIf="filteredPackages.length; else empty">
                     <div class="col-md-4 mb-3" 
                         *ngFor="let pkg of filteredPackages; trackBy: trackById">
                         <app-package-card
