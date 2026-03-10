@@ -1,0 +1,19 @@
+<div class="border border-2 border-dark rounded-3" [id]="'package-card-' + pkg.id">
+    <header class="p-2 mb-2 border-bottom border-2 border-dark"
+        [class.hover-title]="pkg.id === hoveredId"
+        [class.hover-dependency]="hoveredDependencies.includes(pkg.id)"
+        appPackageHover
+        [pkg]="pkg"
+        (packageEnter)="packageEnter.emit($event)"
+        (packageLeave)="packageLeave.emit()"> 
+        <span [class.prefix]="pkg.suffix">{{ pkg.prefix }}</span>
+        <span *ngIf="pkg.suffix">{{ pkg.suffix }}</span>
+    </header>
+    <section class="px-2">
+        <p class="mb-0">
+            {{ pkg.weeklyDownloads | shortNumber }}
+            <span class="material-icons icon-sm">download</span>
+        </p>   
+        <p class="text-muted"> {{ pkg.dependencyCount }} dependencies </p> 
+    </section>
+</div>

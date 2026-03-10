@@ -1,0 +1,20 @@
+$prefix-color: #efb121;
+$hover-title-bg-color: rgb(155, 216, 233);
+$hover-dependency-bg-color: rgb(228, 178, 163);
+
+.prefix{
+    color: $prefix-color;
+}
+
+.hover-title {
+    background-color: $hover-title-bg-color
+}
+
+.hover-dependency {
+    background-color: $hover-dependency-bg-color;
+}
+
+.icon-sm {
+    font-size: 16px;
+    vertical-align: middle;
+}
