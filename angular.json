@@ -10,7 +10,17 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss"
+          "style": "scss",
+          "skipTests": true,
+          "type": "component"
+        },
+        "@schematics/angular:service": {
+          "skipTests": true,
+          "type": "service"
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true,
+          "type": "directive"
         }
       },
       "root": "",
@@ -30,6 +40,7 @@
               }
             ],
             "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.scss"
             ]
           },

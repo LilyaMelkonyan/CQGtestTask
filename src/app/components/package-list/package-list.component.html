@@ -1,0 +1,41 @@
+<div class="container mt-4">
+    <div class="col-12 mb-3">
+        <div class="d-flex">
+            <input type="text" name="search" placeholder="search..." 
+                [(ngModel)]="searchedItem"
+                (input)="filterByName()">
+            <button type="button" [disabled]="isLoading" (click)="getPackagesWithDependencies()">
+                <span class="material-icons align-middle">refresh</span>
+            </button>
+        </div>
+    </div>
+    <div class="col-12 border border-1 border-dark p-3 scroll-box">
+        <div class="row">
+            <ng-container *ngIf="!isLoading, else loading">
+                <ng-container *ngIf="filteredPackages && filteredPackages.length; else empty">
+                    <div class="col-md-4 mb-3" 
+                        *ngFor="let pkg of filteredPackages; trackBy: trackById">
+                        <app-package-card
+                            [pkg]="pkg"
+                            [hoveredId]="hoveredId"
+                            [hoveredDependencies]="hoveredDependencies"
+                            (packageEnter)="onPackageEnter($event)"
+                            (packageLeave)="onPackageLeave()"></app-package-card>
+                    </div>
+                </ng-container>
+
+                <ng-template #empty>
+                    <div class="col-12">
+                        No packages!!!
+                    </div>
+                </ng-template>
+            </ng-container>
+
+            <ng-template #loading>
+                <div class="col-12 text-center">
+                    <span class="spinner-border spinner-border-lg" role="status" aria-hidden="true"></span>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>
