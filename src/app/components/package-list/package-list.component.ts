@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -18,14 +18,22 @@ import { PackageWithDeps } from '../../shared/models/package.model';
 })
 export class PackageListComponent {
   #destroy$ = new Subject<void>();
-  searchedItem!: string;
-  packages: PackageWithDeps[] = [];
-  filteredPackages: PackageWithDeps[] = [];
-  hoveredId: string | null = null;
-  hoveredDependencies: string[] = [];
-  isLoading: boolean = false;
+  isLoading = signal<boolean>(false);
+  searchedItem = signal<string>('');
+  private readonly packages = signal<PackageWithDeps[]>([]);
 
-  constructor(private packageService: PackageService, private cd: ChangeDetectorRef){}
+  filteredPackages = computed(() => {
+    const name = (this.searchedItem() ?? '').trim().toLowerCase();
+    const filteredPackages = name ? this.packages().filter(pkg => pkg.id.toLowerCase().includes(name)) : [...this.packages()];
+    return filteredPackages;
+  })
+  
+  hoveredId = signal<string | null>(null);
+  hoveredDependencies = signal<string[]>([]);
+
+  private packageService = inject(PackageService);
+
+  constructor(){}
 
   ngOnInit(){
     this.getPackagesWithDependencies()
@@ -37,40 +45,23 @@ export class PackageListComponent {
   }
 
   getPackagesWithDependencies() {
-    this.isLoading = true
+    this.isLoading.set(true);
+
     this.packageService.getPackagesWithDependencies()
       .pipe(
-        finalize(() => {
-          this.isLoading = false;
-          this.searchedItem = '';
-        }),
+        finalize(() => this.isLoading.set(false)),
         takeUntil(this.#destroy$)
       )
-      .subscribe(packages => {
-        this.packages = this.filteredPackages = packages;
-        this.cd.markForCheck();
-      })
-  }
-
-  filterByName() {
-    // for large data is better to use fromEvent with debounceTime and distinctUntilChange
-    const name = this.searchedItem.trim().toLowerCase();
-    this.filteredPackages = name ? 
-      this.packages.filter(pkg => pkg.id.toLowerCase().includes(name)) : 
-      this.packages
-  }
-
-  trackById(index: number, pkg: PackageWithDeps) {
-    return pkg.id
+      .subscribe(packages => this.packages.set(packages))
   }
 
   onPackageEnter(pkg: PackageWithDeps) {
-    this.hoveredId = pkg.id;
-    this.hoveredDependencies = pkg.dependencies;
+    this.hoveredId.set(pkg.id);
+    this.hoveredDependencies.set(pkg.dependencies);
   }
 
   onPackageLeave() {
-    this.hoveredId = null;
-    this.hoveredDependencies = []
+    this.hoveredId.set(null);
+    this.hoveredDependencies.set([])
   }
 }

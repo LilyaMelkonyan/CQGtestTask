@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PackageWithDeps } from '../../shared/models/package.model';
@@ -17,14 +17,13 @@ import { ShortNumberPipe } from '../../shared/pipes/short-number-pipe';
   styleUrl: './package-card.component.scss',
 })
 export class PackageCardComponent {
-  @Input() pkg!: PackageWithDeps;
-  @Input() hoveredId!: string | null;
-  @Input() hoveredDependencies!: string[];
+  pkg = input.required<PackageWithDeps>();
+  hoveredId = input<string | null>();
+  hoveredDependencies = input.required<string[]>();
+  packageEnter = output<PackageWithDeps>();
+  packageLeave = output<void>();
 
-  @Output() packageEnter = new EventEmitter<PackageWithDeps>();
-  @Output() packageLeave = new EventEmitter<void>();
+  hoveredDependenciesSet = computed(() => new Set(this.hoveredDependencies()));
 
   constructor(){}
-
-  ngOnInit() {}
 }

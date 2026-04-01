@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { catchError, forkJoin, map, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { Package, PackageWithDeps } from '../shared/models/package.model';
 import { API_URL } from '../tokens/api-url.token';
@@ -10,8 +10,10 @@ import { API_URL } from '../tokens/api-url.token';
 export class PackageService {
   // for caching request
   #packagesWithDependencies$?: Observable<PackageWithDeps[]>; 
+  private http = inject(HttpClient);
+  private url = inject(API_URL);
 
-  constructor(private http: HttpClient, @Inject(API_URL) private url: string){}
+  constructor(){}
 
   getPackages(): Observable<Package[]> {
     return this.http.get<Package[]>(`${this.url}/packages`)
@@ -34,11 +36,13 @@ export class PackageService {
               suffix: rest.join('/')
             };
 
-            if (!pkg.dependencyCount) {
-              return of({
+            const initialState = {
                 ...basePkg, 
                 dependencies: []
-              })
+            };
+
+            if (!pkg.dependencyCount) {
+              return of(initialState)
             }
 
             return this.getPackageDependencies(pkg.id)
@@ -47,10 +51,7 @@ export class PackageService {
                   ...basePkg,
                   dependencies
                 })),
-                catchError(_ => of({
-                  ...basePkg,
-                  dependencies: []
-                }))
+                catchError(_ => of(initialState))
               )
           });
           

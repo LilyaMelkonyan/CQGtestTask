@@ -1,13 +1,13 @@
-import { Directive, EventEmitter, HostBinding, HostListener, Input, Output } from '@angular/core';
+import { Directive, HostBinding, HostListener, input, output } from '@angular/core';
 import { PackageWithDeps } from '../models/package.model';
 
 @Directive({
   selector: '[appPackageHover]',
 })
 export class PackageHoverDirective {
-  @Input() pkg!: PackageWithDeps;
-  @Output() packageEnter = new EventEmitter<PackageWithDeps>();
-  @Output() packageLeave = new EventEmitter<void>()
+  pkg = input.required<PackageWithDeps>();
+  packageEnter = output<PackageWithDeps>();
+  packageLeave = output<void>();
   
   constructor() {}
 
@@ -15,7 +15,7 @@ export class PackageHoverDirective {
 
   @HostListener('mouseenter')
   onMouseEnter() {
-    this.packageEnter.emit(this.pkg)
+    this.packageEnter.emit(this.pkg())
   }
 
   @HostListener('mouseleave')
