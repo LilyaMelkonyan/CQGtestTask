@@ -1,5 +1,6 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { finalize, Subject, takeUntil } from 'rxjs';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PackageService } from '../../services/package.service';
@@ -17,7 +18,6 @@ import { PackageWithDeps } from '../../shared/models/package.model';
   styleUrl: './package-list.component.scss',
 })
 export class PackageListComponent {
-  #destroy$ = new Subject<void>();
   isLoading = signal<boolean>(false);
   searchedItem = signal<string>('');
   private readonly packages = signal<PackageWithDeps[]>([]);
@@ -32,16 +32,12 @@ export class PackageListComponent {
   hoveredDependencies = signal<string[]>([]);
 
   private packageService = inject(PackageService);
+  private destroyRef = inject(DestroyRef);
 
   constructor(){}
 
   ngOnInit(){
     this.getPackagesWithDependencies()
-  }
-
-  ngOnDestroy(){
-    this.#destroy$.next();
-    this.#destroy$.complete()
   }
 
   getPackagesWithDependencies() {
@@ -50,7 +46,7 @@ export class PackageListComponent {
     this.packageService.getPackagesWithDependencies()
       .pipe(
         finalize(() => this.isLoading.set(false)),
-        takeUntil(this.#destroy$)
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(packages => this.packages.set(packages))
   }
